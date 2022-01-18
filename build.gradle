@@ -1,0 +1,98 @@
+buildscript {
+    ext.kotlin_version = '1.5.31'
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "$kotlin_version"
+    id 'java'
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+group 'ru.barabo'
+
+tasks.withType(JavaExec) {
+    jvmArgs = ['-Xmx2g']
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+
+    flatDir {
+        dirs '../../repo'
+    }
+}
+
+dependencies {
+    //implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: "$kotlin_version"
+
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: "$kotlin_version"
+
+    compile group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.5-1'
+
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.+'
+
+    compile group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
+
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+
+    compile name: 'ojdbc6'
+
+    //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+
+
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+
+    kotlinOptions {
+        languageVersion = "1.5"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'ru.barabo.plan.main.PlanKt'
+    }
+
+    //configurations.implementation.canBeResolved = true
+    //configurations.api.canBeResolved = true
+
+    //configurations.co
+
+    //configurations.implementation.setCanBeResolved(true)
+    //configurations.api.setCanBeResolved(true)
+
+    from configurations.compile.collect {
+        //from configurations.runtimeClasspath.collect  {
+        it.isDirectory() ? it : zipTree(it).matching{
+            exclude {
+                it.name.contains('.DSA') ||
+                        it.name.contains('.SF') ||
+                        it.name.contains('.RSA')
+            }
+        }
+    }
+}
+
+task(runMain, dependsOn: 'classes', type: JavaExec) {
+    main = 'ru.barabo.plan.main.PlanKt'
+    classpath = sourceSets.main.runtimeClasspath
+}

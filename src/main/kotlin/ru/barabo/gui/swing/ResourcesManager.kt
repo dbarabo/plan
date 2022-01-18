@@ -29,6 +29,7 @@ object ResourcesManager {
         val xlsBundle: ResourceBundle = ResourceBundle.getBundle(
             "properties.xls_names", UTF8Control()
         )
+
         var path = try {
             xlsBundle.getString(fileXls)
         } catch (ex: Exception) {
