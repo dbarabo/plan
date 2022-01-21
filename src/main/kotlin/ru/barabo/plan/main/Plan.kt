@@ -55,7 +55,7 @@ class Plan : JFrame() {
         layout = BorderLayout()
 
         title = title()
-        iconImage = ResourcesManager.getIcon("report")?.image
+        iconImage = ResourcesManager.getIcon("plan")?.image
 
         val mainBook = ConfigBankPanel(store)
 
