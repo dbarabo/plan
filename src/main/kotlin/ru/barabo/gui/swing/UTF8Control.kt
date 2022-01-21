@@ -1,5 +1,6 @@
 package ru.barabo.gui.swing
 
+import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -28,10 +29,8 @@ class UTF8Control : ResourceBundle.Control() {
             if (url != null) {
                 val connection: URLConnection = url.openConnection()
 
-                if (connection != null) {
-                    connection.useCaches = false
-                    stream = connection.getInputStream()
-                }
+                connection.useCaches = false
+                stream = connection.getInputStream()
             }
         } else {
             stream = loader.getResourceAsStream(resourceName)
@@ -46,4 +45,34 @@ class UTF8Control : ResourceBundle.Control() {
         }
         return bundle
     }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(UTF8Control::class.java)
+
+        @JvmStatic
+        fun getXlsPath(fileXls: String?): URL? {
+
+            fileXls ?: return null
+
+            val xlsBundle: ResourceBundle = ResourceBundle.getBundle(
+                "properties.xls_names", UTF8Control()
+            )
+
+            val path = try {
+                xlsBundle.getString(fileXls)
+            } catch (ex: Exception) {
+                logger.error("getXlsPath is null " + ex.localizedMessage)
+                null
+            }
+
+            if (path == null || path == "") {
+                return null
+            }
+
+            return ResourcesManager.pathResource("/xls/$path")
+        }
+    }
 }
+
+
+

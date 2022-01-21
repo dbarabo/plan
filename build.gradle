@@ -1,5 +1,7 @@
+import org.gradle.api.tasks.JavaExec
+
 buildscript {
-    ext.kotlin_version = '1.5.31'
+    ext.kotlin_version = "1.6.10"
 
     repositories {
         mavenCentral()
@@ -7,13 +9,8 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "$kotlin_version"
-    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
 }
-
-apply plugin: 'idea'
-apply plugin: 'java'
-apply plugin: 'kotlin'
 
 group 'ru.barabo'
 
@@ -21,45 +18,45 @@ tasks.withType(JavaExec) {
     jvmArgs = ['-Xmx2g']
 }
 
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
 compileJava.options.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()
 
-    flatDir {
-        dirs '../../repo'
-    }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    //implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: "$kotlin_version"
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: "$kotlin_version"
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: "$kotlin_version"
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: "$kotlin_version"
 
-    compile group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.5-1'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.+'
+    implementation group: 'org.swinglabs.swingx', name: 'swingx-all', version: '1.6.5-1'
 
-    compile group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.11'
 
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+    implementation group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
 
-    compile name: 'ojdbc6'
+    implementation group: 'com.oracle.database.jdbc', name: 'ojdbc6', version: '11.2.0.4'
 
-    //testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation group: 'com.github.dbarabo', name: 'dbjdb', version: '0.9.5'
 
-
+    implementation group: 'com.github.dbarabo', name: 'xlsx', version: '0.9.10'
 }
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 
     kotlinOptions {
-        languageVersion = "1.5"
+        languageVersion = "1.6"
     }
 }
 
@@ -68,21 +65,15 @@ compileTestKotlin {
 }
 
 jar {
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         attributes 'Main-Class': 'ru.barabo.plan.main.PlanKt'
     }
 
-    //configurations.implementation.canBeResolved = true
-    //configurations.api.canBeResolved = true
-
-    //configurations.co
-
-    //configurations.implementation.setCanBeResolved(true)
-    //configurations.api.setCanBeResolved(true)
-
-    from configurations.compile.collect {
-        //from configurations.runtimeClasspath.collect  {
-        it.isDirectory() ? it : zipTree(it).matching{
+    from configurations.runtimeClasspath.collect  {
+        it.isDirectory() ? it : zipTree(it).matching {
             exclude {
                 it.name.contains('.DSA') ||
                         it.name.contains('.SF') ||
@@ -90,9 +81,4 @@ jar {
             }
         }
     }
-}
-
-task(runMain, dependsOn: 'classes', type: JavaExec) {
-    main = 'ru.barabo.plan.main.PlanKt'
-    classpath = sourceSets.main.runtimeClasspath
 }

@@ -11,7 +11,6 @@ import jxl.write.*;
 import jxl.write.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.barabo.gui.swing.ResourcesManager;
 import ru.barabo.gui.swing.UTF8Control;
 import ru.barabo.plan.construct.bank.data.DBStoreFinBankPlanType;
 import ru.barabo.plan.construct.bank.data.FinBankPlanTypeRow;
@@ -23,6 +22,8 @@ import java.io.*;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static ru.barabo.gui.swing.UTF8Control.getXlsPath;
 
 
 public class ExportAccounts {
@@ -65,8 +66,7 @@ public class ExportAccounts {
 		WritableWorkbook copy = null;
 		Workbook workbook0 = null;
 		
-		
-		URL inputUrl = ResourcesManager.getXlsPath("exportAccount");
+		URL inputUrl = getXlsPath("exportAccount");
 		
 		ResourceBundle xlsBundle = ResourceBundle.getBundle(
         		"properties.xls_names", new UTF8Control() );
@@ -76,22 +76,14 @@ public class ExportAccounts {
 		File tempalte = null;
 		
 		try {
-			
-		   InputStream input = inputUrl.openStream();
-		   
-		   tempalte = new File(getHomeFilePath()  + path);
-		   
-	       try {
-    	     		        	
-	            FileOutputStream output = new FileOutputStream(tempalte);
-	            try {
-	                copy(input, output);
-	            } finally {
-	            	output.close();
-	            }
-	        } finally {
-	        	input.close();
-	        }
+
+			try (InputStream input = inputUrl.openStream()) {
+				tempalte = new File(getHomeFilePath() + path);
+
+				try (FileOutputStream output = new FileOutputStream(tempalte)) {
+					copy(input, output);
+				}
+			}
 		   
 		} catch (java.io.IOException e) {
 			
@@ -176,16 +168,14 @@ public class ExportAccounts {
 				e.printStackTrace();
 				logger.error("execExcel " + e.getLocalizedMessage());
 			}
-		};
-		
+		}
 	}
 	
 	public static String getHomeFilePath() {
 		final javax.swing.JFileChooser fr = new javax.swing.JFileChooser(); 
-		final javax.swing.filechooser.FileSystemView fw = fr.getFileSystemView(); 
-		String path = fw.getDefaultDirectory().getAbsolutePath() + File.separator;
-		
-		return path;
+		final javax.swing.filechooser.FileSystemView fw = fr.getFileSystemView();
+
+		return fw.getDefaultDirectory().getAbsolutePath() + File.separator;
 	
 	}
 	
@@ -217,7 +207,7 @@ public class ExportAccounts {
 				
 				String percent = srcData.get(index).getAccountsPercent();
 				if(percent != null && !"".equals(percent)) {
-					if(headerName == null || "".equals(headerName)) {
+					if("".equals(headerName)) {
 						headerName = percent;
 					} else {
 						headerName += "\n" + percent;
