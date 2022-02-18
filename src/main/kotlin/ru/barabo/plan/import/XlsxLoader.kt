@@ -1,14 +1,11 @@
 package ru.barabo.plan.import
 
 import org.apache.poi.ss.usermodel.*
-import java.io.File
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.apache.poi.xssf.usermodel.XSSFSheet
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.sql.Date
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 private val logger = LoggerFactory.getLogger("xlsxFileLoad")
 
@@ -142,31 +139,14 @@ private fun XSSFSheet.findDateColumns(rowIndex: Int, startColumnIndex: Int): Map
     return result
 }
 
-private fun String.byDateValue(index: Int): Pair<Int, Date>? {
-
-    return try {
-        val date = Date(
-            Date.from(
-                LocalDate.parse(this.trim(), DATE_FORMATTER ).atStartOfDay(ZoneId.systemDefault()).toInstant() ).time)
-
-        Pair(index, date)
-
-     } catch (e: java.lang.Exception) {
-        null
-    }
-}
-
-private const val DATE_FORMAT = "dd.MM.yyyy"
-
-private val DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT)
-
 private fun XSSFSheet.parseSections(sections: Map<Section, List<SectionInfo>>): Pair<Int, Int> {
 
     val (nameSectionRowIndex, nameSectionColumnIndex) = findHeaderSection()
 
     for(keySection in sections.keys) {
 
-        keySection.rows.addAll( findMainSection(keySection.name, nameSectionColumnIndex, nameSectionRowIndex + 1) )
+        keySection.rows.addAll(
+            findMainSection(keySection.name, nameSectionColumnIndex, nameSectionRowIndex + 1) )
     }
 
     return Pair(nameSectionRowIndex, nameSectionColumnIndex)
@@ -194,19 +174,28 @@ private fun XSSFSheet.parseSubSections(nameColumnIndex: Int, sectionsRows: List<
 
 private fun XSSFSheet.findSubSections(rowStart: Int, nameColumnIndex: Int, subSection: MutableMap<String, Int?>) {
 
+    var index = 0
+
     for (sectionItem in subSection.keys) {
         if(subSection[sectionItem] != null) continue
 
-        subSection[sectionItem] = findSubSection(rowStart, nameColumnIndex, sectionItem)
+        subSection[sectionItem] = findSubSection(rowStart, nameColumnIndex, sectionItem, index)
+        index++
     }
 }
 
-private fun XSSFSheet.findSubSection(rowStartIndex: Int, columnIndex: Int, sectionItem: String): Int? {
+private fun XSSFSheet.findSubSection(rowStartIndex: Int, columnIndex: Int, sectionItem: String, index: Int): Int? {
 
+    var count = 0
     for(rowIndex in (rowStartIndex..lastRowNum)) {
 
-        if(isMainSectionType(rowIndex, columnIndex)) return null
-
+        if(isMainSectionType(rowIndex, columnIndex)) {
+            if(index == 0 || count > 5) {
+                return null
+            } else {
+                count++
+            }
+        }
         if(isEqualStringCell(sectionItem, rowIndex, columnIndex)) return rowIndex
     }
 
@@ -317,4 +306,5 @@ private const val HEADER_SECTION_NAME = "Наименование статьи"
 
 private const val OPTIONAL_SHEET = "RUS"
 
-private val SHEET_NAMES = mapOf("GOL" to "VDK", "SPS" to "SPS", "SLV" to "SLV", "NHD" to "NAH", OPTIONAL_SHEET to OPTIONAL_SHEET)
+private val SHEET_NAMES =
+    mapOf("GOL" to "VDK", "SPS" to "SPS", "SLV" to "SLV", "NHD" to "NAH", OPTIONAL_SHEET to OPTIONAL_SHEET)
