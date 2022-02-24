@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import ru.barabo.plan.construct.bank.data.FinBankPlanTypeRow;
 import ru.barabo.plan.construct.bank.gui.table.TablePlanExecData;
+import ru.barabo.plan.data.gui.PanelPlanData;
 import ru.barabo.total.db.DBStore;
 
 /**
@@ -25,11 +26,12 @@ public class ConfigBankPanel extends JPanel {
 	public ConfigBankPanel(DBStore<FinBankPlanTypeRow> store) {
 		
 		setLayout(new BorderLayout());
-		
-		
+
 		TablePlanExecData tableFocus = new TablePlanExecData(store);
+
+		PanelPlanData panelPlanData = new PanelPlanData(this);
 		
-		add(new TopToolBar<FinBankPlanTypeRow>(store, tableFocus), BorderLayout.NORTH);
+		add(new TopToolBar<FinBankPlanTypeRow>(store, tableFocus, panelPlanData), BorderLayout.NORTH);
 
 		PanelEvents<FinBankPlanTypeRow> leftPanel = 
 				new PanelEvents<FinBankPlanTypeRow>(store);

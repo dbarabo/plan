@@ -3,11 +3,8 @@ package ru.barabo.plan.import
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.sql.Date
-
-private val logger = LoggerFactory.getLogger("xlsxFileLoad")
 
 internal fun xlsxFileLoad(file: File, sections: Map<Section, List<SectionInfo>> ): Pair<String, List<ValueDB>> {
 
@@ -92,7 +89,7 @@ private fun XSSFSheet.calcValuesByDate(office: String, sections: Map<Section, Li
 
         for (item in section) {
 
-            calcValue(item.info.values, dateColumn.key)?.let {
+            calcValue(item.info.values, dateColumn.key, item.prefix)?.let {
 
                 result += ValueDB(item.idFnBankPlanType, dateColumn.value, office, it)
             }
@@ -102,11 +99,11 @@ private fun XSSFSheet.calcValuesByDate(office: String, sections: Map<Section, Li
     return result
 }
 
-private fun XSSFSheet.calcValue(info: MutableCollection<Int?>, dateColumnIndex: Int): Double? {
+private fun XSSFSheet.calcValue(info: MutableCollection<Int?>, dateColumnIndex: Int, prefix: Char?): Double? {
 
     if(info.firstOrNull { it != null } == null) return null
 
-    return info.filterNotNull().sumOf { getNumberValueOrZero(it, dateColumnIndex) }
+    return info.filterNotNull().sumOf { getNumberValueOrZero(it, dateColumnIndex) } * (if(prefix == null) 1 else -1)
 }
 
 private fun Map<Section, List<SectionInfo>>.clearAllInfo() {
@@ -308,3 +305,6 @@ private const val OPTIONAL_SHEET = "RUS"
 
 private val SHEET_NAMES =
     mapOf("GOL" to "VDK", "SPS" to "SPS", "SLV" to "SLV", "NHD" to "NAH", OPTIONAL_SHEET to OPTIONAL_SHEET)
+
+internal val SHEET_LABELS =
+    mapOf<String, String>("Владивосток" to "VDK", "Спасск" to "SPS", "Славянка" to "SLV", "Находка" to "NAH", "Русская" to OPTIONAL_SHEET)

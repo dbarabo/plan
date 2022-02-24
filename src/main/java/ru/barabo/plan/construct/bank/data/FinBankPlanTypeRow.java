@@ -24,7 +24,7 @@ public class FinBankPlanTypeRow extends AbstractRowFields {
 		List<FieldItem> fields = new ArrayList<FieldItem>();
 		
 		fields.add(new Field("#id", true, Type.LONG, null, "ID", 50, 0, true)); // id
-		fields.add(new Field("Наименование", true, Type.STRING, null, "NAME", 250, 1, false)); // name
+		fields.add(new Field("Наименование", true, Type.STRING, null, "NAME", 400, 1, false)); // name
 		fields.add(new Field("Тип строки", true, Type.LONG,
 				
 				new String[]{"1-Заголовок неред",     
@@ -40,13 +40,13 @@ public class FinBankPlanTypeRow extends AbstractRowFields {
 		
 		fields.add(new Field("План сорт", true, Type.LONG, null, "ORD", 50, 3, false)); // ord
 		fields.add(new Field("Символы", true, Type.STRING, null, "SYMBOLS", 100, 4, false)); // symbols
-		fields.add(new Field("Реал сорт", true, Type.LONG, null, "ORD_REAL", 40, 5, false)); // ordReal
+		fields.add(new Field("Реал сорт", true, Type.LONG, null, "ORD_REAL", 40, 5, true)); // ordReal
 		fields.add(new Field("План/Реал", true, Type.LONG,
 				new String[]{"Все", "План", "Реал", "Нигде"}, "HIDE", 40, 6, false,
 				new Integer[]{0, 2, 1, 4} )); //hide
 		
-		fields.add(new Field("Счета", true, Type.STRING, null, "ACCOUNT", 200, 7, false)); // account
-		fields.add(new Field("Счета от %%", true, Type.STRING, null, "ACCOUNT_PERC", 150, 8, false)); // accountPerc
+		fields.add(new Field("Счета", true, Type.STRING, null, "ACCOUNT", 150, 7, false)); // account
+		fields.add(new Field("Счета от %%", true, Type.STRING, null, "ACCOUNT_PERC", 100, 8, false)); // accountPerc
 		fields.add(new Field("Часть %%", true, Type.DECIMAL, null, "PERCENT", 40, 9, false)); // percent
 		fields.add(new Field("Вид символ.", true, Type.STRING, null, "DESC_SYMBOL", 80, 10, false)); // descSymbol
 		fields.add(new Field("Формула", true, Type.STRING, null, "FORMULA", 150, 11, false)); // formula

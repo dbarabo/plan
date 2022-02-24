@@ -6,7 +6,17 @@ import java.io.File
 import java.sql.Date
 import java.util.regex.Pattern
 
-internal data class SectionInfo(val idFnBankPlanType: Long, val info: MutableMap<String, Int?>)
+internal data class SectionInfo(val idFnBankPlanType: Long, val info: MutableMap<String, Int?>, val prefix: Char? = null)
+
+private fun createSectionOnfo(idFnBankPlanType: Long, info: MutableMap<String, Int?>): SectionInfo {
+    if(info.entries.size != 1) return SectionInfo(idFnBankPlanType, info)
+
+    val first = info.keys.first()
+
+    if(first.isEmpty() || first[0] != '-') return SectionInfo(idFnBankPlanType, info)
+
+    return SectionInfo(idFnBankPlanType, mutableMapOf<String, Int?>(first.substring(1) to null), first[0])
+}
 
 internal data class Section(val name: String, val rows: MutableList<Int> = ArrayList())
 
@@ -75,10 +85,10 @@ internal fun loadDBInfo(): Map<Section, List<SectionInfo>> {
             priorSection = Section(section)
 
             priorSectionInfo = ArrayList()
-            priorSectionInfo += SectionInfo(id, subSections)
+            priorSectionInfo += createSectionOnfo(id, subSections)
 
         } else {
-            priorSectionInfo += SectionInfo(id, subSections)
+            priorSectionInfo += createSectionOnfo(id, subSections)
         }
     }
 

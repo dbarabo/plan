@@ -2,18 +2,25 @@ package ru.barabo.plan.construct.bank.gui.component;
 
 import ru.barabo.db.SessionException;
 import ru.barabo.plan.construct.bank.data.DBStoreFinBankPlanType;
+import ru.barabo.plan.data.gui.PanelPlanData;
 import ru.barabo.total.db.DBStore;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 
-import javax.swing.JComponent;
-import javax.swing.JToggleButton;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 
 
 public class TopToolBar <E> extends AbstractTopToolBar<E> {
 
-	public TopToolBar(DBStore<E> store, JComponent focusComp) {
+	private final PanelPlanData panelPlanData;
+
+	public TopToolBar(DBStore<E> store, JComponent focusComp, PanelPlanData panelPlanData) {
 		super(store, focusComp);
+
+		this.panelPlanData = panelPlanData;
+
 		initButton();
 	}
 
@@ -60,22 +67,54 @@ public class TopToolBar <E> extends AbstractTopToolBar<E> {
 			focusComp.requestFocus();}, null) ,
 			
 		new ButtonKarkas(null, null, null, null),
-		
-		new ButtonKarkas("add_group", "Добавить Офисы",
-				(ActionEvent e)-> {addOfficces(e); }, null),
+
+		new ButtonKarkas("importXLS", "->Загрузить План из файла...",
+				this::importPlanXlsx, null),
+
+		new ButtonKarkas("plan32", "Плановые данные...",
+				this::showPlanData, null)
+			/*
 				
 		new ButtonKarkas("importXLS", "->Загрузить из XLS-файла...", 
 				(ActionEvent e)-> {importFromExcel(e); }, null),
 				
 		
 		new ButtonKarkas("exportXLS", "Выгрузить в XLS-файл->", 
-						(ActionEvent e)-> {exportToExcel(e); }, null),		
+						(ActionEvent e)-> {exportToExcel(e); }, null),
+
+		 */
 	};
+
+	private void importPlanXlsx(ActionEvent e) {
+
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(new FileFilter() {
+
+			public String getDescription() {
+				return "xlsx-файл с планом (*.xlsx)";
+			}
+
+			public boolean accept(File f) {
+				if (f.isDirectory()) {
+					return true;
+				} else {
+					String filename = f.getName().toLowerCase();
+					return filename.endsWith(".xlsx");
+				}
+			}
+		});
+
+		if(fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) return;
+
+		panelPlanData.processXlsxFile(fileChooser.getSelectedFile());
+	}
+
+	private void showPlanData(ActionEvent e) {
+
+		panelPlanData.showPanel();
+	}
 	
-	/**
-	 * 
-	 * @param e
-	 */
 	private void importFromExcel(ActionEvent e) {
 		((DBStoreFinBankPlanType)store).importFromExcel();
 		
@@ -89,10 +128,6 @@ public class TopToolBar <E> extends AbstractTopToolBar<E> {
 	}
 	
 	
-	/**
-	 * добавляем доп. офисы и меняем тип у текущего
-	 * @param e
-	 */
 	private void addOfficces(ActionEvent e) {
 		try {
 			((DBStoreFinBankPlanType)store).addOffices();
