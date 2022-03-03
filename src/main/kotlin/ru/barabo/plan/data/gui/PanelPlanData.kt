@@ -19,7 +19,7 @@ class PanelPlanData(private val mainContainer: Container) : JPanel() {
 
         add(toolBar, BorderLayout.NORTH)
 
-        add(JScrollPane(TablePlanData()), BorderLayout.CENTER)
+        add(JScrollPane(TablePlanData), BorderLayout.CENTER)
     }
 
     fun showPanel() {
@@ -53,5 +53,5 @@ class PanelPlanData(private val mainContainer: Container) : JPanel() {
         }
     }
 
-    fun infoLoaded(file: File) = "Файл ${file.name} загружен в Афину\nДааные можно увидеть выбрав кнопку 'Плановые данные...'"
+    fun infoLoaded(file: File) = "Файл ${file.name} загружен в Афину\nДанные можно увидеть выбрав кнопку 'Плановые данные...'"
 }

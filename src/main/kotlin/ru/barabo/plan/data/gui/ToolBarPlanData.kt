@@ -4,6 +4,7 @@ import org.jdesktop.swingx.JXHyperlink
 import ru.barabo.gui.swing.comboBox
 import ru.barabo.gui.swing.maxSpaceXConstraint
 import ru.barabo.gui.swing.processShowError
+import ru.barabo.gui.swing.toolButton
 import ru.barabo.plan.data.service.officeKey
 import ru.barabo.plan.data.service.year
 import ru.barabo.plan.data.service.yearsNow
@@ -55,6 +56,10 @@ class ToolBarPlanData(private val myPanelContainer: Container, private val mainC
             }
 
             this.maximumRowCount = this.itemCount
+        }
+
+        toolButton("copy16", "Копировать всю таблицу") {
+            TablePlanData.copyTable()
         }
 
         maxSpaceXConstraint(8)

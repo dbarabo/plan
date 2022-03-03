@@ -3,9 +3,12 @@ package ru.barabo.plan.data.gui
 import ru.barabo.gui.swing.cross.CrossColumn
 import ru.barabo.gui.swing.cross.CrossColumns
 import ru.barabo.gui.swing.cross.CrossTable
+import ru.barabo.gui.swing.cross.CrossTableModel
 import ru.barabo.plan.data.entity.PlanData
 import ru.barabo.plan.data.service.PlanDataService
 import ru.barabo.plan.data.service.yearDate
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.sql.Timestamp
 import java.time.format.DateTimeFormatter
 
@@ -41,7 +44,32 @@ private val columnsPlanData = arrayOf(
 
 private val crossPlanDataColumns = CrossColumns(1, true, columnsPlanData)
 
-class TablePlanData : CrossTable<PlanData>( crossPlanDataColumns, PlanDataService)
+object TablePlanData : CrossTable<PlanData>( crossPlanDataColumns, PlanDataService)
 
 fun formatDateAdd(yearDate: Timestamp, addMonth: Long = 0L): String =
     yearFormatter.format(yearDate.toLocalDateTime().plusMonths(addMonth) )
+
+
+fun CrossTable<*>.copyTable() {
+
+    val modelThis = this.model as CrossTableModel<*>
+
+    val tableData = StringBuilder()
+
+    tableData.append(modelThis.columnNames()).append("\n")
+
+    for(rowIndex in 0 until modelThis.rowCount) {
+
+        tableData.append(modelThis.rowToString(rowIndex)).append("\n")
+    }
+
+    val selection = StringSelection(tableData.toString())
+
+    Toolkit.getDefaultToolkit().systemClipboard.setContents(selection, selection)
+}
+
+private fun CrossTableModel<*>.columnNames(): String =
+    (0 until columnCount).joinToString("\t") { getColumnName(it) }
+
+private fun CrossTableModel<*>.rowToString(rowIndex: Int): String =
+    (0 until columnCount).joinToString("\t") { getValueAt(rowIndex, it).toString() }
