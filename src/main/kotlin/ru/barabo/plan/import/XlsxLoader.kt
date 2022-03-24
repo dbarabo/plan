@@ -266,7 +266,7 @@ private fun Row.findHeaderSectionColumnIndex(): Int {
 }
 
 private fun XSSFSheet.isEqualStringCell(compareString: String, rowIndex: Int, columnIndex: Int): Boolean =
-    compareString.isEqualStringCell(getRow(rowIndex).getCell(columnIndex) )
+    compareString.isEqualStringCell(getRow(rowIndex)?.getCell(columnIndex) )
 
 private fun String.isEqualStringCell(cellCompare: Cell?): Boolean =
     (cellCompare?.getStringOrNull()?.trim()?.equals(this, true) == true)
