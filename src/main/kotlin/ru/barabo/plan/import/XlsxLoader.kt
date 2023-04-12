@@ -303,7 +303,7 @@ private const val HEADER_SECTION_NAME = "Наименование статьи"
 
 private const val OPTIONAL_SHEET = "RUS"
 
-private val SHEET_NAMES =
+val SHEET_NAMES =
     mapOf("GOL" to "VDK", "SPS" to "SPS", "SLV" to "SLV", "NHD" to "NAH", OPTIONAL_SHEET to OPTIONAL_SHEET)
 
 internal val SHEET_LABELS =

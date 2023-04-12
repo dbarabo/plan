@@ -4,6 +4,8 @@ import org.slf4j.LoggerFactory
 import ru.barabo.afina.AfinaQuery
 import java.io.File
 import java.sql.Date
+import java.time.Instant
+import java.time.ZoneId
 import java.util.regex.Pattern
 
 internal data class SectionInfo(val idFnBankPlanType: Long, val info: MutableMap<String, Int?>, val prefix: Char? = null)
@@ -47,12 +49,30 @@ fun processFile(file: File): String {
 
 private fun saveValues(values: List<ValueDB>) {
 
+    val minMaxTime = getMainYear(values)
+
     for(value in values) {
 
         val params = arrayOf<Any?>(value.id, value.date, value.office, value.value)
 
-        AfinaQuery.execute(UPSERT_REGISTER, params)
+        if(value.date.time >= minMaxTime.first && value.date.time <= minMaxTime.second) {
+
+            AfinaQuery.execute(UPSERT_REGISTER, params)
+        }
     }
+}
+
+private fun getMainYear(values: List<ValueDB>): Pair<Long, Long> {
+
+    val mainOffice = SHEET_NAMES.entries.iterator().next().value
+
+    val minDate = values.filter { it.office == mainOffice }
+        .minByOrNull { it.date.time }?.date?.time ?: throw java.lang.Exception("minDate not found")
+
+    val maxDate = values.filter { it.office == mainOffice }
+        .maxByOrNull { it.date.time }?.date?.time ?: throw java.lang.Exception("maxDate not found")
+
+    return Pair(minDate, maxDate)
 }
 
 internal fun loadDBInfo(): Map<Section, List<SectionInfo>> {
